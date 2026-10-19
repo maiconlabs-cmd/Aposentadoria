@@ -178,6 +178,12 @@
       font-weight: 750;
     }
 
+    .user-profile-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
     .status-pill {
       display: flex;
       align-items: center;
@@ -234,6 +240,103 @@
     .page-heading p {
       margin-top: 8px;
       color: var(--muted);
+    }
+
+    /* LOGIN */
+    .login-container {
+      min-height: calc(100vh - 160px);
+      display: grid;
+      place-items: center;
+    }
+
+    .login-card {
+      width: min(440px, 100%);
+      padding: 40px;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .login-card h2 {
+      color: var(--primary-dark);
+      font-size: 26px;
+      margin-bottom: 8px;
+    }
+
+    .login-card p {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 28px;
+    }
+
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      text-align: left;
+    }
+
+    .forgot-password-link {
+      display: inline-block;
+      margin-top: 4px;
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 650;
+      text-decoration: none;
+      text-align: right;
+      cursor: pointer;
+    }
+
+    .forgot-password-link:hover {
+      text-decoration: underline;
+    }
+
+    /* MODAL ESQUECI MINHA SENHA */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(37, 33, 43, 0.6);
+      backdrop-filter: blur(4px);
+      display: none;
+      place-items: center;
+      z-index: 200;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      display: grid;
+    }
+
+    .modal-card {
+      width: min(400px, 100%);
+      padding: 30px;
+      border-radius: 20px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      text-align: left;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .modal-card h3 {
+      color: var(--primary-dark);
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+
+    .modal-card p {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
     }
 
     /* HOME */
@@ -719,7 +822,6 @@
         background: white;
       }
 
-      /* Oculta menus, botões e textos desnecessários na impressão */
       .sidebar,
       .topbar,
       .page-heading,
@@ -748,7 +850,6 @@
         display: block !important;
       }
 
-      /* Layout lado a lado para colocar a foto no topo junto à ficha */
       .form-layout {
         display: flex !important;
         flex-direction: row-reverse !important;
@@ -973,20 +1074,25 @@
           <span>Home</span>
         </button>
 
-        <button class="nav-btn" data-view="fichaView">
+        <button class="nav-btn protected" data-view="fichaView">
           <span class="nav-icon">▣</span>
           <span>Ficha</span>
         </button>
 
-        <button class="nav-btn" data-view="pacientesView">
+        <button class="nav-btn protected" data-view="pacientesView">
           <span class="nav-icon">♙</span>
           <span>Pacientes</span>
+        </button>
+
+        <button class="nav-btn" data-view="loginView" id="navLoginBtn">
+          <span class="nav-icon">🔑</span>
+          <span id="navLoginText">Acesso / Login</span>
         </button>
       </nav>
 
       <div class="sidebar-footer">
-        Sistema local de gestão<br />
-        Os dados ficam salvos neste navegador.
+        Sistema em nuvem<br />
+        Conectado ao Firebase.
       </div>
     </aside>
 
@@ -998,13 +1104,55 @@
           Página inicial
         </div>
 
-        <div class="status-pill">
-          <span class="status-dot"></span>
-          Sistema ativo
+        <div class="user-profile-info">
+          <div class="status-pill" id="statusPill">
+            <span class="status-dot"></span>
+            <span id="statusText">Acesso Restrito</span>
+          </div>
+          <button class="btn btn-outline" id="logoutBtn" style="display: none; padding: 5px 10px; min-height: auto; font-size: 11px;">
+            Sair
+          </button>
         </div>
       </header>
 
       <div class="content">
+
+        <!-- LOGIN -->
+        <section class="view" id="loginView">
+          <div class="login-container">
+            <div class="login-card">
+              <h2>Área Restrita</h2>
+              <p>Digite seu e-mail e senha para acessar o cadastro e os pacientes.</p>
+
+              <form class="login-form" id="loginForm">
+                <div class="field">
+                  <label for="loginEmail">E-mail de Acesso</label>
+                  <input
+                    id="loginEmail"
+                    type="email"
+                    placeholder="seuemail@exemplo.com"
+                    required
+                  />
+                </div>
+
+                <div class="field">
+                  <label for="loginPassword">Senha</label>
+                  <input
+                    id="loginPassword"
+                    type="password"
+                    placeholder="••••••••"
+                    required
+                  />
+                  <a class="forgot-password-link" id="openForgotModal">Esqueci minha senha</a>
+                </div>
+
+                <button class="btn btn-primary" type="submit" style="margin-top: 10px;">
+                  Entrar no sistema
+                </button>
+              </form>
+            </div>
+          </div>
+        </section>
 
         <!-- HOME -->
         <section class="view active" id="homeView">
@@ -1016,7 +1164,7 @@
 
               <img
                 class="home-logo"
-                src="https://i.ibb.co/tMk385Wm/servico-social-logo-png-seeklogo-219700.png"
+                src="https://i.ibb.co/mrsh0s8q/file-00000000f058820e8d72ac7b8b795fc7.png"
                 alt="Logo Serviço Social"
                 onerror="this.style.display='none'"
               />
@@ -1314,10 +1462,56 @@
     </main>
   </div>
 
+  <!-- MODAL DE RECUPERAÇÃO DE SENHA -->
+  <div class="modal-overlay" id="forgotModal">
+    <div class="modal-card">
+      <h3>Recuperar senha</h3>
+      <p>Digite seu e-mail cadastrado. Enviaremos um link seguro para você redefinir sua senha.</p>
+      
+      <form id="forgotForm">
+        <div class="field">
+          <label for="forgotEmail">E-mail de cadastro</label>
+          <input
+            id="forgotEmail"
+            type="email"
+            placeholder="seuemail@exemplo.com"
+            required
+            style="margin-top: 5px;"
+          />
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-outline" type="button" id="closeForgotModal">Cancelar</button>
+          <button class="btn btn-primary" type="submit">Enviar e-mail</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 
-  <script>
-    const STORAGE_KEY = "cristina_pacientes_v1";
+  <!-- IMPORTAÇÃO DO FIREBASE VIA CDN (Modulado) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, getDocs, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+
+    // Configuração do Firebase fornecida
+    const firebaseConfig = {
+      apiKey: "AIzaSyCyCRODeHhejBYKCpLxSGmRUIBnJzIoVnc",
+      authDomain: "sistema-social-cb816.firebaseapp.com",
+      projectId: "sistema-social-cb816",
+      storageBucket: "sistema-social-cb816.firebasestorage.app",
+      messagingSenderId: "971249909470",
+      appId: "1:971249909470:web:94a04accb2baab16568c4f"
+    };
+
+    // Inicializar Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
 
     const fields = [
       "tipoAposentadoria",
@@ -1333,7 +1527,10 @@
     ];
 
     let currentId = null;
-    let currentPhoto = "";
+    let currentPhotoUrl = "";
+    let selectedImageFile = null;
+    let cachedPatients = [];
+    let isAuthenticated = false;
 
     const $ = (selector) => document.querySelector(selector);
 
@@ -1346,34 +1543,54 @@
     const patientCount = $("#patientCount");
     const sidebar = $("#sidebar");
     const toast = $("#toast");
+    const loginForm = $("#loginForm");
+    const logoutBtn = $("#logoutBtn");
 
-    function getPatients() {
-      try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-      } catch {
-        return [];
+    const forgotModal = $("#forgotModal");
+    const openForgotModal = $("#openForgotModal");
+    const closeForgotModal = $("#closeForgotModal");
+    const forgotForm = $("#forgotForm");
+
+    // Monitorar estado de autenticação do Firebase
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        isAuthenticated = true;
+        updateAuthUI(user.email);
+        loadPatientsFromCloud();
+      } else {
+        isAuthenticated = false;
+        updateAuthUI(null);
+        cachedPatients = [];
       }
-    }
+    });
 
-    function savePatients(patients) {
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(patients)
-      );
+    function updateAuthUI(email) {
+      if (isAuthenticated) {
+        $("#statusText").textContent = email || "Autorizado";
+        $("#navLoginText").textContent = "Sair do Sistema";
+        logoutBtn.style.display = "inline-flex";
+      } else {
+        $("#statusText").textContent = "Acesso Restrito";
+        $("#navLoginText").textContent = "Acesso / Login";
+        logoutBtn.style.display = "none";
+      }
     }
 
     function showToast(message) {
       toast.textContent = message;
       toast.classList.add("show");
-
       clearTimeout(showToast.timer);
-
       showToast.timer = setTimeout(() => {
         toast.classList.remove("show");
       }, 3000);
     }
 
     function showView(viewId) {
+      if ((viewId === "fichaView" || viewId === "pacientesView") && !isAuthenticated) {
+        showToast("Faça login com seu e-mail e senha para acessar.");
+        viewId = "loginView";
+      }
+
       document.querySelectorAll(".view").forEach((view) => {
         view.classList.toggle("active", view.id === viewId);
       });
@@ -1387,63 +1604,50 @@
 
       const titles = {
         homeView: "Página inicial",
+        loginView: "Acesso ao Sistema",
         fichaView: "Ficha de atendimento",
         pacientesView: "Pacientes cadastrados"
       };
 
-      $("#topbarTitle").textContent =
-        titles[viewId] || "CRISTINA";
-
+      $("#topbarTitle").textContent = titles[viewId] || "CRISTINA";
       sidebar.classList.remove("open");
 
       if (viewId === "pacientesView") {
         renderPatients();
       }
 
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     function clearForm() {
       form.reset();
-
       currentId = null;
-      currentPhoto = "";
-
+      currentPhotoUrl = "";
+      selectedImageFile = null;
       recordNumber.textContent = "NOVA FICHA";
       photoInput.value = "";
-
       renderPhoto();
     }
 
     function fillForm(patient) {
       fields.forEach((field) => {
         const element = document.getElementById(field);
-
         if (element) {
           element.value = patient[field] || "";
         }
       });
 
       currentId = patient.id;
-      currentPhoto = patient.photo || "";
+      currentPhotoUrl = patient.photo || "";
+      selectedImageFile = null;
 
-      recordNumber.textContent =
-        "FICHA " + patient.id.slice(-6).toUpperCase();
-
+      recordNumber.textContent = "FICHA " + patient.id.slice(-6).toUpperCase();
       renderPhoto();
     }
 
     function renderPhoto() {
-      if (currentPhoto) {
-        photoPreview.innerHTML = `
-          <img
-            src="${currentPhoto}"
-            alt="Foto do paciente"
-          />
-        `;
+      if (currentPhotoUrl) {
+        photoPreview.innerHTML = `<img src="${currentPhotoUrl}" alt="Foto do paciente" />`;
       } else {
         photoPreview.innerHTML = `
           <div class="photo-placeholder">
@@ -1456,69 +1660,83 @@
 
     function collectFormData() {
       const data = {};
-
       fields.forEach((field) => {
-        data[field] =
-          document.getElementById(field).value.trim();
+        data[field] = document.getElementById(field).value.trim();
       });
-
-      data.photo = currentPhoto;
-
+      data.photo = currentPhotoUrl;
       return data;
     }
 
-    function saveCurrentPatient() {
+    // Carregar pacientes do Firestore
+    async function loadPatientsFromCloud() {
+      if (!isAuthenticated) return;
+      try {
+        const querySnapshot = await getDocs(collection(db, "pacientes"));
+        cachedPatients = [];
+        querySnapshot.forEach((docSnap) => {
+          cachedPatients.push({ id: docSnap.id, ...docSnap.data() });
+        });
+        // Ordenar por data de criação decrescente se houver
+        cachedPatients.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+        if ($("#pacientesView").classList.contains("active")) {
+          renderPatients();
+        }
+      } catch (error) {
+        console.error("Erro ao carregar pacientes:", error);
+        showToast("Erro ao buscar dados do servidor.");
+      }
+    }
+
+    // Salvar paciente no Firestore e Foto no Storage
+    async function saveCurrentPatient() {
       if (!form.checkValidity()) {
         form.reportValidity();
         return null;
       }
 
-      const data = collectFormData();
-      const patients = getPatients();
+      showToast("Salvando dados na nuvem...");
 
-      if (currentId) {
-        const index = patients.findIndex(
-          (patient) => patient.id === currentId
-        );
+      try {
+        // Se houver uma nova foto selecionada para upload
+        if (selectedImageFile) {
+          const storageRef = ref(storage, `pacientes_fotos/${Date.now()}_${selectedImageFile.name}`);
+          const snapshot = await uploadBytes(storageRef, selectedImageFile);
+          currentPhotoUrl = await getDownloadURL(snapshot.ref);
+        }
 
-        if (index !== -1) {
-          patients[index] = {
-            ...patients[index],
+        const data = collectFormData();
+
+        if (currentId) {
+          // Atualizar registro existente
+          const docRef = doc(db, "pacientes", currentId);
+          await updateDoc(docRef, {
             ...data,
             updatedAt: new Date().toISOString()
-          };
+          });
+        } else {
+          // Criar novo registro
+          const docRef = await addDoc(collection(db, "pacientes"), {
+            ...data,
+            createdAt: new Date().toISOString()
+          });
+          currentId = docRef.id;
         }
-      } else {
-        currentId = Date.now().toString();
 
-        patients.unshift({
-          id: currentId,
-          ...data,
-          createdAt: new Date().toISOString()
-        });
+        recordNumber.textContent = "FICHA " + currentId.slice(-6).toUpperCase();
+        showToast("Ficha salva com sucesso na nuvem!");
+        await loadPatientsFromCloud();
+        return currentId;
+      } catch (error) {
+        console.error("Erro ao salvar:", error);
+        showToast("Erro ao salvar: " + error.message);
+        return null;
       }
-
-      savePatients(patients);
-
-      recordNumber.textContent =
-        "FICHA " + currentId.slice(-6).toUpperCase();
-
-      showToast("Ficha salva com sucesso.");
-
-      return currentId;
     }
 
     function formatDate(dateString) {
-      if (!dateString) {
-        return "Não informado";
-      }
-
+      if (!dateString) return "Não informado";
       const parts = dateString.split("-");
-
-      if (parts.length !== 3) {
-        return dateString;
-      }
-
+      if (parts.length !== 3) return dateString;
       return `${parts[2]}/${parts[1]}/${parts[0]}`;
     }
 
@@ -1542,67 +1760,39 @@
     }
 
     function renderPatients() {
-      const search = searchInput.value
-        .trim()
-        .toLowerCase();
-
-      const patients = getPatients().filter((patient) => {
-        return (patient.nome || "")
-          .toLowerCase()
-          .includes(search);
+      const search = searchInput.value.trim().toLowerCase();
+      const patients = cachedPatients.filter((patient) => {
+        return (patient.nome || "").toLowerCase().includes(search);
       });
 
-      patientCount.textContent =
-        `${patients.length} paciente${
-          patients.length === 1 ? "" : "s"
-        }`;
+      patientCount.textContent = `${patients.length} paciente${patients.length === 1 ? "" : "s"}`;
 
       if (!patients.length) {
         patientsGrid.innerHTML = `
           <div class="empty-state" style="grid-column: 1 / -1">
             <strong>Nenhum paciente encontrado</strong>
-            ${
-              search
-                ? "Tente pesquisar por outro nome."
-                : "Cadastre a primeira ficha para começar."
-            }
+            ${search ? "Tente pesquisar por outro nome." : "Cadastre a primeira ficha para começar."}
           </div>
         `;
-
         return;
       }
 
       patientsGrid.innerHTML = patients
         .map((patient) => {
           const avatar = patient.photo
-            ? `
-              <img
-                src="${patient.photo}"
-                alt="Foto de ${escapeHTML(patient.nome)}"
-              />
-            `
+            ? `<img src="${patient.photo}" alt="Foto de ${escapeHTML(patient.nome)}" />`
             : escapeHTML(getInitials(patient.nome));
 
           return `
             <article class="patient-card">
               <div class="patient-top">
-                <div class="patient-avatar">
-                  ${avatar}
-                </div>
-
+                <div class="patient-avatar">${avatar}</div>
                 <div style="min-width: 0">
-                  <div
-                    class="patient-name"
-                    title="${escapeHTML(patient.nome)}"
-                  >
+                  <div class="patient-name" title="${escapeHTML(patient.nome)}">
                     ${escapeHTML(patient.nome)}
                   </div>
-
                   <div class="patient-type">
-                    ${escapeHTML(
-                      patient.tipoAposentadoria ||
-                      "Tipo não informado"
-                    )}
+                    ${escapeHTML(patient.tipoAposentadoria || "Tipo não informado")}
                   </div>
                 </div>
               </div>
@@ -1610,51 +1800,22 @@
               <div class="patient-info">
                 <div>
                   <span>CPF</span>
-                  <span>
-                    ${escapeHTML(
-                      patient.cpf || "Não informado"
-                    )}
-                  </span>
+                  <span>${escapeHTML(patient.cpf || "Não informado")}</span>
                 </div>
-
                 <div>
                   <span>Telefone</span>
-                  <span>
-                    ${escapeHTML(
-                      patient.telefone || "Não informado"
-                    )}
-                  </span>
+                  <span>${escapeHTML(patient.telefone || "Não informado")}</span>
                 </div>
-
                 <div>
                   <span>Solicitação</span>
-                  <span>
-                    ${formatDate(patient.dataSolicitacao)}
-                  </span>
+                  <span>${formatDate(patient.dataSolicitacao)}</span>
                 </div>
               </div>
 
               <div class="patient-actions">
-                <button
-                  class="btn btn-primary"
-                  data-edit="${patient.id}"
-                >
-                  Visualizar
-                </button>
-
-                <button
-                  class="btn btn-outline"
-                  data-print="${patient.id}"
-                >
-                  Imprimir
-                </button>
-
-                <button
-                  class="btn btn-light-danger"
-                  data-delete="${patient.id}"
-                >
-                  Excluir
-                </button>
+                <button class="btn btn-primary" data-edit="${patient.id}">Visualizar</button>
+                <button class="btn btn-outline" data-print="${patient.id}">Imprimir</button>
+                <button class="btn btn-light-danger" data-delete="${patient.id}">Excluir</button>
               </div>
             </article>
           `;
@@ -1663,65 +1824,41 @@
     }
 
     function editPatient(id) {
-      const patient = getPatients().find(
-        (item) => item.id === id
-      );
-
+      const patient = cachedPatients.find((item) => item.id === id);
       if (!patient) {
         showToast("Paciente não encontrado.");
         return;
       }
-
       fillForm(patient);
       showView("fichaView");
     }
 
-    function deletePatient(id) {
-      const patient = getPatients().find(
-        (item) => item.id === id
-      );
+    async function deletePatient(id) {
+      const patient = cachedPatients.find((item) => item.id === id);
+      if (!patient) return;
 
-      if (!patient) {
-        return;
+      const confirmed = confirm(`Deseja realmente excluir o cadastro de ${patient.nome}?`);
+      if (!confirmed) return;
+
+      try {
+        await deleteDoc(doc(db, "pacientes", id));
+        if (currentId === id) {
+          clearForm();
+        }
+        await loadPatientsFromCloud();
+        showToast("Cadastro excluído com sucesso.");
+      } catch (error) {
+        console.error("Erro ao excluir:", error);
+        showToast("Erro ao excluir o registro.");
       }
-
-      const confirmed = confirm(
-        `Deseja realmente excluir o cadastro de ${patient.nome}?`
-      );
-
-      if (!confirmed) {
-        return;
-      }
-
-      const patients = getPatients().filter(
-        (item) => item.id !== id
-      );
-
-      savePatients(patients);
-
-      if (currentId === id) {
-        clearForm();
-      }
-
-      renderPatients();
-      showToast("Cadastro excluído.");
     }
 
     function printPatient(id) {
-      const patient = getPatients().find(
-        (item) => item.id === id
-      );
-
-      if (!patient) {
-        return;
-      }
-
+      const patient = cachedPatients.find((item) => item.id === id);
+      if (!patient) return;
       fillForm(patient);
       showView("fichaView");
-
-      setTimeout(() => {
-        window.print();
-      }, 300);
+      setTimeout(() => { window.print(); }, 300);
     }
 
     function downloadCurrentFile() {
@@ -1729,33 +1866,19 @@
         form.reportValidity();
         return;
       }
-
       const data = collectFormData();
-
       const fileContent = {
         sistema: "CRISTINA - Gestão de Pacientes",
         exportadoEm: new Date().toISOString(),
         dados: data
       };
-
-      const blob = new Blob(
-        [JSON.stringify(fileContent, null, 2)],
-        {
-          type: "application/json;charset=utf-8"
-        }
-      );
-
+      const blob = new Blob([JSON.stringify(fileContent, null, 2)], { type: "application/json;charset=utf-8" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
-
       link.href = url;
-      link.download =
-        `ficha-${data.nome || "paciente"}.json`;
-
+      link.download = `ficha-${data.nome || "paciente"}.json`;
       link.click();
-
       URL.revokeObjectURL(url);
-
       showToast("Arquivo salvo no seu dispositivo.");
     }
 
@@ -1769,48 +1892,110 @@
     }
 
     function applyPhoneMask(value) {
-      const numbers = value
-        .replace(/\D/g, "")
-        .slice(0, 11);
-
+      const numbers = value.replace(/\D/g, "").slice(0, 11);
       if (numbers.length <= 10) {
-        return numbers
-          .replace(/(\d{2})(\d)/, "($1) $2")
-          .replace(/(\d{4})(\d)/, "$1-$2");
+        return numbers.replace(/(\d{2})(\d)/, "($1) $2").replace(/(\d{4})(\d)/, "$1-$2");
       }
-
-      return numbers
-        .replace(/(\d{2})(\d)/, "($1) $2")
-        .replace(/(\d{5})(\d)/, "$1-$2");
+      return numbers.replace(/(\d{2})(\d)/, "($1) $2").replace(/(\d{5})(\d)/, "$1-$2");
     }
+
+    // Ação de Login no Firebase
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = $("#loginEmail").value.trim();
+      const password = $("#loginPassword").value;
+
+      try {
+        showToast("Entrando...");
+        await signInWithEmailAndPassword(auth, email, password);
+        showToast("Login realizado com sucesso!");
+        showView("pacientesView");
+        loginForm.reset();
+      } catch (error) {
+        console.error("Erro no login:", error);
+        showToast("Erro ao entrar: E-mail ou senha incorretos.");
+      }
+    });
+
+    async function performLogout() {
+      try {
+        await signOut(auth);
+        showToast("Sessão encerrada.");
+        showView("homeView");
+      } catch (error) {
+        console.error("Erro ao sair:", error);
+      }
+    }
+
+    // Eventos do Modal "Esqueci minha senha" (Firebase real)
+    openForgotModal.addEventListener("click", () => {
+      forgotModal.classList.add("active");
+    });
+
+    closeForgotModal.addEventListener("click", () => {
+      forgotModal.classList.remove("active");
+      forgotForm.reset();
+    });
+
+    forgotModal.addEventListener("click", (e) => {
+      if (e.target === forgotModal) {
+        forgotModal.classList.remove("active");
+        forgotForm.reset();
+      }
+    });
+
+    forgotForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = $("#forgotEmail").value.trim();
+
+      if (email) {
+        try {
+          await sendPasswordResetEmail(auth, email);
+          showToast("E-mail de recuperação enviado! Verifique sua caixa de entrada.");
+          forgotModal.classList.remove("active");
+          forgotForm.reset();
+        } catch (error) {
+          console.error("Erro ao recuperar senha:", error);
+          showToast("Erro ao enviar e-mail: verifique o endereço digitado.");
+        }
+      }
+    });
+
+    $("#navLoginBtn").addEventListener("click", () => {
+      if (isAuthenticated) {
+        performLogout();
+      } else {
+        showView("loginView");
+      }
+    });
+
+    logoutBtn.addEventListener("click", performLogout);
 
     // Navegação
     document.querySelectorAll(".nav-btn").forEach((button) => {
       button.addEventListener("click", () => {
-        showView(button.dataset.view);
+        if (button.id !== "navLoginBtn") {
+          showView(button.dataset.view);
+        }
       });
     });
 
-    document
-      .querySelectorAll("[data-action='new']")
-      .forEach((button) => {
-        button.addEventListener("click", () => {
-          clearForm();
-          showView("fichaView");
-        });
+    document.querySelectorAll("[data-action='new']").forEach((button) => {
+      button.addEventListener("click", () => {
+        clearForm();
+        showView("fichaView");
       });
+    });
 
-    document
-      .querySelector("[data-action='patients']")
-      .addEventListener("click", () => {
-        showView("pacientesView");
-      });
+    document.querySelector("[data-action='patients']").addEventListener("click", () => {
+      showView("pacientesView");
+    });
 
     $("#mobileMenu").addEventListener("click", () => {
       sidebar.classList.toggle("open");
     });
 
-    // Salvamento
+    // Salvamento de fichas
     form.addEventListener("submit", (event) => {
       event.preventDefault();
       saveCurrentPatient();
@@ -1825,17 +2010,13 @@
       showToast("Nova ficha pronta para preenchimento.");
     });
 
-    $("#saveFileBtn").addEventListener(
-      "click",
-      downloadCurrentFile
-    );
+    $("#saveFileBtn").addEventListener("click", downloadCurrentFile);
 
     $("#pdfBtn").addEventListener("click", () => {
       if (!form.checkValidity()) {
         form.reportValidity();
         return;
       }
-
       window.print();
     });
 
@@ -1844,80 +2025,58 @@
         form.reportValidity();
         return;
       }
-
       window.print();
     });
 
-    // Foto do paciente
+    // Manipulação de Fotos (Preparo para Storage)
     photoInput.addEventListener("change", (event) => {
       const file = event.target.files[0];
-
-      if (!file) {
-        return;
-      }
+      if (!file) return;
 
       if (!file.type.startsWith("image/")) {
         showToast("Selecione um arquivo de imagem válido.");
         return;
       }
 
+      selectedImageFile = file;
+
+      // Pré-visualização local imediata
       const reader = new FileReader();
-
       reader.onload = () => {
-        currentPhoto = reader.result;
+        currentPhotoUrl = reader.result;
         renderPhoto();
-        showToast("Foto adicionada à ficha.");
+        showToast("Foto carregada (será salva na nuvem ao salvar a ficha).");
       };
-
       reader.readAsDataURL(file);
     });
 
     $("#removePhotoBtn").addEventListener("click", () => {
-      currentPhoto = "";
+      currentPhotoUrl = "";
+      selectedImageFile = null;
       photoInput.value = "";
       renderPhoto();
       showToast("Foto removida.");
     });
 
-    // Pesquisa
     searchInput.addEventListener("input", renderPatients);
 
-    // Ações dos cards de pacientes
     patientsGrid.addEventListener("click", (event) => {
       const editButton = event.target.closest("[data-edit]");
       const printButton = event.target.closest("[data-print]");
       const deleteButton = event.target.closest("[data-delete]");
 
-      if (editButton) {
-        editPatient(editButton.dataset.edit);
-      }
-
-      if (printButton) {
-        printPatient(printButton.dataset.print);
-      }
-
-      if (deleteButton) {
-        deletePatient(deleteButton.dataset.delete);
-      }
+      if (editButton) editPatient(editButton.dataset.edit);
+      if (printButton) printPatient(printButton.dataset.print);
+      if (deleteButton) deletePatient(deleteButton.dataset.delete);
     });
 
-    // Máscara CPF
     $("#cpf").addEventListener("input", (event) => {
-      event.target.value = applyCPFMask(
-        event.target.value
-      );
+      event.target.value = applyCPFMask(event.target.value);
     });
 
-    // Máscara telefone
     $("#telefone").addEventListener("input", (event) => {
-      event.target.value = applyPhoneMask(
-        event.target.value
-      );
+      event.target.value = applyPhoneMask(event.target.value);
     });
-
-    // Estado inicial
-    renderPhoto();
-    renderPatients();
   </script>
 </body>
 </html>
